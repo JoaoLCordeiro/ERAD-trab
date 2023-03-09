@@ -1,0 +1,4 @@
+i21 slots=8
+i26 slots=8
+i27 slots=8
+i36 slots=8
