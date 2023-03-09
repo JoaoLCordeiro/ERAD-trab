@@ -1,4 +1,8 @@
-i21 slots=2
-i26 slots=2
-i27 slots=2
-i36 slots=2
+i40 slots=1
+i37 slots=1
+i34 slots=1
+i33 slots=1
+i31 slots=1
+i29 slots=1
+i27 slots=1
+i26 slots=1

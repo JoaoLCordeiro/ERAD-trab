@@ -1,0 +1,8 @@
+i40 slots=8
+i37 slots=8
+i34 slots=8
+i33 slots=8
+i31 slots=8
+i29 slots=8
+i27 slots=8
+i26 slots=8
