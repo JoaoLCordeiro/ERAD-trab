@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
+#include <time.h>
 
 #include "chrono.c"
 
@@ -19,7 +20,7 @@ const int SEED = 100;
 
 int nProc, rankProc;
 
-chronometer_t cronometro;
+chronometer_t cronometroTotal, cronometroTrab;
 
 void my_Bcast(TYPEMSG *buffMsg, int ni, MPI_Datatype mpi_data, int raiz, MPI_Comm comm);
 
@@ -324,22 +325,23 @@ void my_Bcast(TYPEMSG *buffMsg, int ni, MPI_Datatype mpi_data, int raiz, MPI_Com
 	}
 
 	// envia as mensagens que tem que mandar
-	for (; faseComeco < numFases; faseCoint  rankProc) % nProc;
-		// se for a ultima fase de transmissoes, faz umas verificacoes
-		if (faseComeco == numFases - 1)
-		{
+	for (; faseComeco < numFases ; faseComeco++){
+		destinoMsg = (pow2(faseComeco) + rankProc) % nProc;
+
+		//se for a ultima fase de transmissoes, faz umas verificacoes
+		if (faseComeco == numFases - 1){
 			int distancia;
 			if (raiz <= rankProc)
 				distancia = rankProc - raiz;
 			else
 				distancia = rankProc + nProc - raiz;
-			// calcula se a mensagem deve ser realmente enviada
+			//calcula se a mensagem deve ser realmente enviada
 			//(casos onde nProc nao eh potencia de 2)
 			if (distancia + pow2(faseComeco) < nProc)
-				MPI_Ssend(buffMsg, ni, mpi_data, destinoMsg, 0, comm);
+				MPI_Ssend (buffMsg, ni, MPI_LONG, destinoMsg, 0, MPI_COMM_WORLD);
 		}
 		else
-			MPI_Ssend(buffMsg, ni, mpi_data, destinoMsg, 0, comm);
+			MPI_Ssend (buffMsg, ni, MPI_LONG, destinoMsg, 0, MPI_COMM_WORLD);
 	}
 }
 
@@ -360,15 +362,26 @@ int main(int argc, char *argv[])
 
 	if (rankProc == raiz)
 		buffMsg = CriaMsg(ni);
-	else buffMsg = (TYPEMSG *)calloc(ni, sizeof(TYPEMSG));
+	else
+        buffMsg = (TYPEMSG *)calloc(ni, sizeof(TYPEMSG));
+
+    srand(777);
+    int *vetorEspera = malloc (nmsg*sizeof(int));
+    for (int i = 0 ; i < nmsg ; i++){
+        vetorEspera[i] = rand() % 9800;
+        vetorEspera[i] += 200;          //entre 200 e 10000 usec
+        vetorEspera[i] *= 1000;         //transforma pra nanosec
+    }
+
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	if (rankProc == 0)
 	{
-		chrono_reset(&cronometro);
-		chrono_start(&cronometro);
+		chrono_reset(&cronometroTotal);
+		chrono_start(&cronometroTotal);
 	}
+    chrono_reset(&cronometroTrab);	
 
 	// função para debug
 	// if (rankProc == 0)
@@ -381,14 +394,17 @@ int main(int argc, char *argv[])
 		my_Bcast(buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD);
 
 		// terminamos o broadcast
+        chrono_start(&cronometroTrab);
         // adicionamos trabalho à fazer
+        nanostop(vetorEspera[imsg]);
+        chrono_stop(&cronometroTrab);
 	}
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	if (rankProc == 0)
 	{
-		chrono_stop(&cronometro);
+		chrono_stop(&cronometroTotal);
 		double tempoMS = (double)chrono_gettotal(&cronometro) / (1000*1000);
 		// double tempoMS	= tempoS * 1000;
 		double vazao = ((tmsg * nmsg) / tempoMS) * (nProc - 1);
