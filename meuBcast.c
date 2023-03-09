@@ -401,7 +401,8 @@ int main(int argc, char *argv[])
 	{
 		// começamos o broadcast
 
-		my_Bcast(buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD);
+		//my_Bcast(buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD);
+        MPI_Bcast (buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD);
 
 		// terminamos o broadcast
         chrono_start(&cronometroTrab);
