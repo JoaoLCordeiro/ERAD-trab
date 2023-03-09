@@ -345,6 +345,16 @@ void my_Bcast(TYPEMSG *buffMsg, int ni, MPI_Datatype mpi_data, int raiz, MPI_Com
 	}
 }
 
+void simulaTrab (int nanosecs){
+    struct timespec rem;
+    struct timespec req= {
+        0,
+        nanosecs
+    };
+
+    nanosleep(&req , &rem);
+}
+
 int main(int argc, char *argv[])
 {
 	int nmsg, tmsg, raiz;
@@ -366,7 +376,7 @@ int main(int argc, char *argv[])
         buffMsg = (TYPEMSG *)calloc(ni, sizeof(TYPEMSG));
 
     srand(777);
-    int *vetorEspera = malloc (nmsg*sizeof(int));
+    int *vetorEspera = (int *) malloc (nmsg*sizeof(int));
     for (int i = 0 ; i < nmsg ; i++){
         vetorEspera[i] = rand() % 9800;
         vetorEspera[i] += 200;          //entre 200 e 10000 usec
@@ -396,7 +406,7 @@ int main(int argc, char *argv[])
 		// terminamos o broadcast
         chrono_start(&cronometroTrab);
         // adicionamos trabalho à fazer
-        nanostop(vetorEspera[imsg]);
+        simulaTrab (vetorEspera[imsg]);
         chrono_stop(&cronometroTrab);
 	}
 
@@ -405,12 +415,10 @@ int main(int argc, char *argv[])
 	if (rankProc == 0)
 	{
 		chrono_stop(&cronometroTotal);
-		double tempoMS = (double)chrono_gettotal(&cronometro) / (1000*1000);
-		// double tempoMS	= tempoS * 1000;
-		double vazao = ((tmsg * nmsg) / tempoMS) * (nProc - 1);
+		double tempo = (double) (chrono_gettotal(&cronometroTotal) - chrono_gettotal(&cronometroTrab));
 
 		fprintf(stdout, "\nNP:	%d	RAIZ:	%d\n", nProc, raiz);
-		fprintf(stdout, "Tempo:	%f	Vazao:	%f\n", tempoMS, vazao);
+		fprintf(stdout, "Tempo:	%f\n", tempo);
 	}
 
 	verifica_my_Bcast(buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD );
