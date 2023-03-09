@@ -1,0 +1,42 @@
+Possiveis adicoes na seção de trabalhos relacionados:
+
+Um estudo da utilização das operações de MPI em aplicações HPC
+de código aberto é apresentado por [laguna et all.]
+Esse trabalho observou que as operações coletivas estão presentes em
+cerca de 99% das aplicações estudadas, sendo que a operação 
+MPI_bcast é a terceira operação coletiva mais utilizada nas aplicações.
+
+O trabalho [Thakur, Rabenseifner e Gropp] indica o algoritmo {\it binomial tree}
+como sendo um algoritmo eficiente para implementação do MPI_bcast, 
+no caso de mensagens curtas.
+
+O trabalho [Nuriyev e Lastovetsky 2020] observa que
+todos os algoritmos de broadcast implementados no OpenMPI, 
+exceto o algoritmo {\it linear tree broadcast} são implementados usando
+segmentação de mensagens. Esse trabalho descreve uma implementação do
+{\it tree-based segmented broadcast algorithm}.
+No OpenMPI, o {\it binomial tree broadcast algorithm} é implementado como
+uma combinação de de broadcast com {\it linear trees} usando operacoes não-bloqueantes
+de send e receive [Nuriyev e Lastovetsky 2020].
+ 
+Nossa implementação do algoritmo {\it binomial tree} para broadcast pode ser
+usada com mensagens bloqueantes ou não-bloqueantes de send e receive.
+
+
+
+
+----------- OBSERVACOES ------------
+As observacoes abaixo 
+nao precisam necessariamente, 
+em principio, estar no paper ERAD 23,
+mas pode ser tomado alguma ideia do que vai abaixo para alguma
+parte ou justificativa do trabalho:
+
+OBS1: FYI o paper [Thakur, Rabenseifner e Gropp] 
+      indica OUTRO metodo para mensagens maiores.
+      MAS vamos medir para mensagens pequenas e tentar descobrir:
+      - SE a versao que está na versão do OpenMPI que usamos foi eficiente
+        (e até que tamanho) em comparação com nossa implementação do bcast com a
+        nossa versao do algoritmo {\it binomial tree}.
+        
+        
