@@ -38,8 +38,8 @@ do
 	echo "$NMSG mensagens de tamanho $ARGTAM com 64 processos" >> resultados-mpi.csv
 	for vez in $(seq 1 10)
 	do
-		mpirun -np 64 -oversubscribe --hostfile hostfile32.txt ./meuBcast "$NMSG" "$ARGTAM" -r 0 | grep 'Tempo:' | awk '{printf "%s\n",$2}' >> resultados-prof.csv
-		mpirun -np 64 -oversubscribe --hostfile hostfile32.txt ./Bcast "$NMSG" "$ARGTAM" -r 0 | grep 'Tempo:' | awk '{printf "%s\n",$2}' >> resultados-mpi.csv
+		mpirun -np 64 -oversubscribe --hostfile hostfile64.txt ./meuBcast "$NMSG" "$ARGTAM" -r 0 | grep 'Tempo:' | awk '{printf "%s\n",$2}' >> resultados-prof.csv
+		mpirun -np 64 -oversubscribe --hostfile hostfile64.txt ./Bcast "$NMSG" "$ARGTAM" -r 0 | grep 'Tempo:' | awk '{printf "%s\n",$2}' >> resultados-mpi.csv
 	done																																			
 	NMSG=$(expr $NMSG / 2)
 done
