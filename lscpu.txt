@@ -1,0 +1,37 @@
+Arquitetura:                     x86_64
+Modo(s) operacional da CPU:      32-bit, 64-bit
+Ordem dos bytes:                 Little Endian
+Tamanhos de endereço:            48 bits physical, 48 bits virtual
+CPU(s):                          2
+Lista de CPU(s) on-line:         0,1
+Thread(s) per núcleo:            1
+Núcleo(s) por soquete:           2
+Soquete(s):                      1
+Nó(s) de NUMA:                   1
+ID de fornecedor:                AuthenticAMD
+Família da CPU:                  23
+Modelo:                          1
+Nome do modelo:                  AMD EPYC 7401 24-Core Processor
+Step:                            2
+CPU MHz:                         2000.000
+BogoMIPS:                        4000.00
+Virtualização:                   AMD-V
+Fabricante do hipervisor:        KVM
+Tipo de virtualização:           completo
+cache de L1d:                    128 KiB
+cache de L1i:                    128 KiB
+cache de L2:                     1 MiB
+cache de L3:                     16 MiB
+CPU(s) de nó0 NUMA:              0,1
+Vulnerability Itlb multihit:     Not affected
+Vulnerability L1tf:              Not affected
+Vulnerability Mds:               Not affected
+Vulnerability Meltdown:          Not affected
+Vulnerability Mmio stale data:   Not affected
+Vulnerability Retbleed:          Mitigation; untrained return thunk; SMT disabled
+Vulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:        Mitigation; Retpolines, IBPB conditional, STIBP disabled, RSB filling, PBRSB-eIBRS Not affected
+Vulnerability Srbds:             Not affected
+Vulnerability Tsx async abort:   Not affected
+Opções:                          fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm rep_good nopl cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw perfctr_core ssbd ibpb vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 xsaves clzero xsaveerptr virt_ssbd arat npt lbrv nrip_save tsc_scale vmcb_clean pausefilter pfthreshold v_vmsave_vmload vgif arch_capabilities
