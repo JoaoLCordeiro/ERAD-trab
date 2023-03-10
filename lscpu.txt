@@ -13,7 +13,7 @@ Família da CPU:                  6
 Modelo:                          158
 Nome do modelo:                  Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz
 Step:                            9
-CPU MHz:                         1100.075
+CPU MHz:                         3400.000
 CPU MHz máx.:                    3800,0000
 CPU MHz mín.:                    800,0000
 BogoMIPS:                        6799.81
