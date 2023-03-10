@@ -3,6 +3,6 @@ i37 slots=2
 i34 slots=2
 i33 slots=2
 i31 slots=2
-i29 slots=2
+i21 slots=2
 i27 slots=2
 i26 slots=2
