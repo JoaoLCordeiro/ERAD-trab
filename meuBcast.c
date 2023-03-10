@@ -22,10 +22,6 @@ int nProc, rankProc;
 
 chronometer_t cronometroTotal, cronometroTrab;
 
-int rank_logico (int raiz){
-	return ((rankProc + nProc - raiz) % nProc);
-}
-
 void my_Bcast(TYPEMSG *buffMsg, int ni, MPI_Datatype mpi_data, int raiz, MPI_Comm comm);
 
 void verifica_my_Bcast( void *buffer, int count, MPI_Datatype datatype,
@@ -218,100 +214,11 @@ TYPEMSG *CriaMsg(int numIndices)
 	return buffMsg;
 }
 
-// retorna o teto do logaritmo base 2, usado para descobrir a fase
-// do processo e pra descobrir o numero de fases necessárias
-int tetoLog(int n)
-{
-	double nd = n;
-	int res = 0;
-
-	while (nd > 1)
-	{
-		res++;
-		nd = nd / 2;
-	}
-
-	return res;
-}
-
-// funcao que descobre a fase em que o processo atual vai receber a mensagem
-int descobreFase(int rankProc, int raiz, int nProc)
-{
-	int distancia;
-	if (rankProc >= raiz)
-		distancia = rankProc - raiz;
-	else
-		distancia = rankProc + nProc - raiz;
-
-	int res;
-	if (distancia == 0)
-		res = distancia;
-	else
-		res = tetoLog(distancia + 1);
-
-	return res;
-}
-
-// funcao que retorna 2^n
-int pow2(int n)
-{
-	if (n == 0)
-		return 1;
-	else
-	{
-		int res = 1;
-		for (int i = 0; i < n; i++)
-			res = res * 2;
-
-		return res;
-	}
-}
-
-// função de debug
-void calculaNumeros(int nProc, int raiz, int numFases)
-{
-	int origemMsg, destinoMsg;
-
-	for (int i = 0; i < nProc; i++)
-	{
-
-		int faseComeco = descobreFase(i, raiz, nProc);
-		fprintf(stdout, "\n\nProcesso:	%d\nComeco:	%d\n", i, faseComeco);
-
-		if (i != raiz)
-		{
-			origemMsg = (i - pow2(faseComeco - 1)) % nProc;
-			if (origemMsg < 0)
-				origemMsg = nProc + origemMsg;
-			fprintf(stdout, "Recebe do:	%d\n", origemMsg);
-		}
-
-		// envia as mensagens que tem que mandar
-		for (; faseComeco < numFases; faseComeco++)
-		{
-			destinoMsg = (pow2(faseComeco) + i) % nProc;
-			if (faseComeco == numFases - 1)
-			{
-				int distancia;
-				if (raiz <= i)
-					distancia = i - raiz;
-				else
-					distancia = i + nProc - raiz;
-				if (distancia + pow2(faseComeco) < nProc)
-					fprintf(stdout, "Manda pro:	%d\n", destinoMsg);
-			}
-			else
-				fprintf(stdout, "Manda pro:	%d\n", destinoMsg);
-		}
-	}
-}
-
 void my_Bcast(TYPEMSG *buffMsg, int ni, MPI_Datatype mpi_data, int raiz, MPI_Comm comm){
 	MPI_Status statusRecv;
 
-	int rankLogic = rank_logico(raiz);
+	int rankLogic = (rankProc + nProc - raiz) % nProc;
 	int destinoMsg;
-	int fase;
 
 	// se o processo nao for a raiz, começa ouvindo
 	if (rankProc != raiz)
@@ -325,8 +232,6 @@ void my_Bcast(TYPEMSG *buffMsg, int ni, MPI_Datatype mpi_data, int raiz, MPI_Com
 
 			MPI_Send(buffMsg, ni, mpi_data, destinoMsg, 0, comm);
 		}
-
-		fase++;
 	}
 }
 
@@ -378,16 +283,12 @@ int main(int argc, char *argv[])
 	}
     chrono_reset(&cronometroTrab);	
 
-	// função para debug
-	// if (rankProc == 0)
-	//	calculaNumeros (nProc, raiz, numFases);
-
 	for (int imsg = 0; imsg < nmsg; imsg++)
 	{
 		// começamos o broadcast
 
-		//my_Bcast(buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD);
-        MPI_Bcast (buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD);
+		my_Bcast(buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD);
+        //MPI_Bcast (buffMsg, ni, MPI_LONG, raiz, MPI_COMM_WORLD);
 
 		// terminamos o broadcast
         chrono_start(&cronometroTrab);
