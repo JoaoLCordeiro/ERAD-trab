@@ -39,23 +39,23 @@ const int SEED = 100;
 void my_Bcast(long int *buf, int count, MPI_Datatype datatype, int root, MPI_Comm comm){
 
 	int np;    // number of participants in each node
-        int comm_size;
-        int my_rank;   // my_phisical rank
-        int my_logic_rank;
-        int rc;
+    int comm_size;
+    int my_rank;   // my_phisical rank
+    int my_logic_rank;
+    int rc;
         
 	MPI_Status stat;
 	MPI_Request request;
 	    
-    	int orig, dest;
+    int orig, dest;
 	static int phase;
 		  
-        MPI_Comm_size( comm, &comm_size );
-        MPI_Comm_rank( comm, &my_rank );
-        // my_logic_rank = ( my_rank + comm_size - root ) % comm_size;
-        my_logic_rank = LOGIC_RANK( my_rank, root, comm_size );
-        
-        //fprintf( stderr, "host: %d my logic rank is %d\n", my_rank, my_logic_rank );
+    MPI_Comm_size( comm, &comm_size );
+    MPI_Comm_rank( comm, &my_rank );
+    // my_logic_rank = ( my_rank + comm_size - root ) % comm_size;
+    my_logic_rank = LOGIC_RANK( my_rank, root, comm_size );
+    
+    //fprintf( stderr, "host: %d my logic rank is %d\n", my_rank, my_logic_rank );
 	
 /*	static int once = 1;
 	if( once ) {
@@ -63,44 +63,43 @@ void my_Bcast(long int *buf, int count, MPI_Datatype datatype, int root, MPI_Com
 	}  
 */
 
-        if(my_rank != root)
-	      rc = MPI_Recv(buf, ni, datatype, MPI_ANY_SOURCE, 0, comm, &stat);
+    if(my_rank != root)
+		rc = MPI_Recv(buf, ni, datatype, MPI_ANY_SOURCE, 0, comm, &stat);
 
+    static int _once_ = 0; //1;
+    phase = 1;
 
-        static int _once_ = 0; //1;
-        phase = 1;
 	//for(int np=1; 2*np <= comm_size; np *= 2 ){
-	for(int np=1; np < comm_size; np *= 2 ){
+	for(int np=1; np < comm_size; np *= 2 ){	
+		
+		//fprintf( stderr, "------------------------------ phase %d np=%d\n", phase, np );	
+		if( my_logic_rank < np && my_logic_rank+np < comm_size ) {
+			//if( my_logic_rank < np && my_logic_rank+np <= comm_size ) {
+		    dest = (my_rank+np)%comm_size; 
+		    //dest = PHYSIC_RANK( my_logic_rank+np, root, comm_size );
+			//rc = MPI_Isend(buf, ni, datatype, dest, 0, comm, &request );
+		
+			rc = MPI_Send(buf, ni, datatype, dest, 0, comm );
+			if( _once_ ){
+		    	fprintf( stderr, "host: %d sending to %d on phase %d\n", my_rank, dest, phase );
+		    	_once_ = 0; 
+		    }  
+		}
 
-	   //fprintf( stderr, "------------------------------ phase %d np=%d\n", phase, np );
-
-
-	   if( my_logic_rank < np && my_logic_rank+np < comm_size ) {
-	   //if( my_logic_rank < np && my_logic_rank+np <= comm_size ) {
-	        dest = (my_rank+np)%comm_size; 
-	        //dest = PHYSIC_RANK( my_logic_rank+np, root, comm_size );
-		//rc = MPI_Isend(buf, ni, datatype, dest, 0, comm, &request );
+		/*
+		if( my_logic_rank < np && my_logic_rank <= comm_size ) {
+		     dest = (my_rank+np)%comm_size; 
+		     //rc = MPI_Isend(buf, ni, datatype, dest, 0, comm, &request );
 		rc = MPI_Send(buf, ni, datatype, dest, 0, comm );
 		if( _once_ ) {
-	          fprintf( stderr, "host: %d sending to %d on phase %d\n", my_rank, dest, phase );
-	          _once_ = 0; 
-	        }  
-	   }
-	   
-	   /*
-	   if( my_logic_rank < np && my_logic_rank <= comm_size ) {
-	        dest = (my_rank+np)%comm_size; 
-	        //rc = MPI_Isend(buf, ni, datatype, dest, 0, comm, &request );
-		rc = MPI_Send(buf, ni, datatype, dest, 0, comm );
-		if( _once_ ) {
-	          fprintf( stderr, "host: %d sending to %d on phase %d\n", my_rank, dest, phase );
-	          _once_ = 0; 
-	        }  
-	   }
-	   */
-	   
-	   phase++;
-        }
+		       fprintf( stderr, "host: %d sending to %d on phase %d\n", my_rank, dest, phase );
+		       _once_ = 0; 
+		     }  
+		}
+		*/
+
+		phase++;
+    }
 	//once = 0; 
 	_once_ = 0;
 }
