@@ -22,10 +22,6 @@ int nProc, rankProc;
 
 chronometer_t cronometroTotal, cronometroTrab;
 
-int rank_logico (int raiz){
-	return ((rankProc + nProc - raiz) % nProc);
-}
-
 void my_Bcast(TYPEMSG *buffMsg, int ni, MPI_Datatype mpi_data, int raiz, MPI_Comm comm);
 
 void verifica_my_Bcast( void *buffer, int count, MPI_Datatype datatype,
@@ -309,24 +305,43 @@ void calculaNumeros(int nProc, int raiz, int numFases)
 void my_Bcast(TYPEMSG *buffMsg, int ni, MPI_Datatype mpi_data, int raiz, MPI_Comm comm){
 	MPI_Status statusRecv;
 
-	int rankLogic = rank_logico(raiz);
+	// aqui descobrimos quantas fases de envio terao
+	int numFases = tetoLog(nProc);
+
 	int destinoMsg;
-	int fase;
+	int origemMsg;
+
+	// aqui descobrimos em qual fase o processo atual começa a ouvir
+	int faseComeco = descobreFase(rankProc, raiz, nProc);
 
 	// se o processo nao for a raiz, começa ouvindo
 	if (rankProc != raiz)
-		MPI_Recv(buffMsg, ni, mpi_data, MPI_ANY_SOURCE, 0, comm, &statusRecv);
+	{
+		origemMsg = (rankProc - pow2(faseComeco - 1)) % nProc;
+		// caso a origem seja maior q o destino, o calculo dará negativo
+		if (origemMsg < 0)
+			origemMsg = nProc + origemMsg;
+		MPI_Recv(buffMsg, ni, mpi_data, origemMsg, 0, comm, &statusRecv);
+	}
 
 	// envia as mensagens que tem que mandar
-	for (int np = 1 ; np < nProc ; np *= 2){
-		
-		if ((rankLogic < np) && (rankLogic + np < nProc)){
-			destinoMsg = (rankProc + np) % nProc;
+	for (; faseComeco < numFases ; faseComeco++){
+		destinoMsg = (pow2(faseComeco) + rankProc) % nProc;
 
-			MPI_Send(buffMsg, ni, mpi_data, destinoMsg, 0, comm);
+		//se for a ultima fase de transmissoes, faz umas verificacoes
+		if (faseComeco == numFases - 1){
+			int distancia;
+			if (raiz <= rankProc)
+				distancia = rankProc - raiz;
+			else
+				distancia = rankProc + nProc - raiz;
+			//calcula se a mensagem deve ser realmente enviada
+			//(casos onde nProc nao eh potencia de 2)
+			if (distancia + pow2(faseComeco) < nProc)
+				MPI_Ssend (buffMsg, ni, MPI_LONG, destinoMsg, 0, MPI_COMM_WORLD);
 		}
-
-		fase++;
+		else
+			MPI_Ssend (buffMsg, ni, MPI_LONG, destinoMsg, 0, MPI_COMM_WORLD);
 	}
 }
 
