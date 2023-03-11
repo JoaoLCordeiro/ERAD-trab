@@ -5,7 +5,7 @@ make -B 2> /dev/null
 rm resultados-prof.csv resultados-mpi.csv 2> /dev/null
 
 #numero de elementos
-NMSG=1000
+NMSG=10000
 
 # para bloqueantes
 for ARGTAM in 8 1024 4096 16384
