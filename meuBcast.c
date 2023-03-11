@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
     srand(777);
     int *vetorEspera = (int *) malloc (nmsg*sizeof(int));
     for (int i = 0 ; i < nmsg ; i++){
-        vetorEspera[i] = rand() % 9800;
+        vetorEspera[i] = rand() % 1800;
         vetorEspera[i] += 200;          //entre 200 e 10000 usec
         vetorEspera[i] *= 1000;         //transforma pra nanosec
     }
